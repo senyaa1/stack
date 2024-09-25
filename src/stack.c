@@ -42,7 +42,7 @@ inline static stack_status_t maybe_decrease_alloc(stack_t *s)
 {
 	// printf("cur index: %ld\tlast_alloc: %ld\n", s->cur_index, s->last_allocation_index);
 	
-	if (s->cur_index <= (s->last_allocation_index / 4) && s->allocated_size / s->elem_size / 4 > MIN_STACK_SIZE)
+	if (s->cur_index <= (s->last_allocation_index / 2) - 1 && s->allocated_size / s->elem_size / 2  - 1> MIN_STACK_SIZE)
 	{
 		return decrease_alloc(s);
 	}
@@ -75,9 +75,8 @@ stack_status_t stack_print(stack_t* s, const char* file, const int line, const c
 		else
 			printf(GREEN "\t\t\t[%d]\t\n" RESET, i);
 	}
-#elif
-	return;
 #endif
+	return STACK_OK;
 }
 
 stack_status_t stack_print_err(stack_status_t status)
