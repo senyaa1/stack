@@ -5,7 +5,8 @@
 int main()
 {
 	stack_t s = {};
-	stack_ctor(&s, sizeof(int), 20);
+	STACK_INIT(&s, sizeof(int), 20);
+	// stack_ctor(&s, sizeof(int), 20);
 
 	for(int i = 0; i < 1000; i++)
 		stack_push(&s, &i);
@@ -18,6 +19,8 @@ int main()
 		// stack_pop(&s, &data);
 		stack_print_err(stack_pop(&s, &data));
 		printf("cur: %d\n", data);
+		if(i > 990)
+			STACK_PRINT(&s);
 	}
 
 

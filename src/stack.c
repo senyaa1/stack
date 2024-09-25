@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include "stack.h"
+#include "colors.h"
 
 static const size_t MIN_STACK_SIZE = 16;
 
@@ -49,6 +50,36 @@ inline static stack_status_t maybe_decrease_alloc(stack_t *s)
 	return STACK_OK;
 }
 
+stack_status_t stack_print(stack_t* s, const char* file, const int line, const char* function)
+{
+	if(!s) return STACK_ERR_ARGNULL;
+
+#ifndef STACK_NDEBUG
+
+	printf( "stack_t %s" BLUE " [%p]. " RESET 
+		"Instantiated at " GREEN UNDERLINE "%s:%d" RESET 
+		", printing from: " CYAN UNDERLINE "%s:%d (%s)\n" RESET,
+		s->instantiated_with_name, s, s->instantiated_at_file, s->instantiated_at_line,
+		file, line, function);
+
+	size_t cap = s->allocated_size / s->elem_size;
+
+	printf("\tcnt \t\t= " YELLOW "%ld\n" RESET, s->cur_index);
+	printf("\tcapacity \t= " YELLOW "%ld\n" RESET, cap);
+	printf("\tdata" BLUE " [%p]\n" RESET, s->buf);
+
+	for(int i = 0; i < cap; i++)
+	{
+		if(i < s->cur_index)
+			printf(RED "\t\t*\t[%d]\t" YELLOW "= %d\n" RESET, i, ((int*)s->buf)[i]);
+		else
+			printf(GREEN "\t\t\t[%d]\t\n" RESET, i);
+	}
+#elif
+	return;
+#endif
+}
+
 stack_status_t stack_print_err(stack_status_t status)
 {
 	if(status == STACK_OK) return status;
@@ -74,7 +105,11 @@ stack_status_t stack_print_err(stack_status_t status)
 	#undef STATSTR	
 }
 
-stack_status_t stack_ctor(stack_t* s, size_t elem_size, size_t initial_size) 
+#ifndef STACK_NDEBUG
+stack_status_t	stack_ctor(stack_t* s, size_t elem_size, size_t initial_size, char* file, int line, char* name)
+#elif
+stack_status_t	stack_ctor(stack_t* s, size_t elem_size, size_t initial_size)
+#endif
 {
 	if(!s) return STACK_ERR_ARGNULL;
 	if(s->buf) return STACK_ERR_INITIALIZED;
@@ -89,6 +124,12 @@ stack_status_t stack_ctor(stack_t* s, size_t elem_size, size_t initial_size)
 	s->allocated_size = to_allocate;
 
 	// memset(s->buf, 0, to_allocate);
+
+#ifndef STACK_NDEBUG
+	s->instantiated_at_file = file;
+	s->instantiated_at_line = line;
+	s->instantiated_with_name = name;
+#endif
 
 	return STACK_OK;
 }
