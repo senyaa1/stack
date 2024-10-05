@@ -1,4 +1,4 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-uint64_t crc64(const void *data, size_t len);
+uint32_t crc32(const char *data, size_t length);
